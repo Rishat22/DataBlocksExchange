@@ -16,10 +16,11 @@ public:
 
 private:
     void do_read();
+	void deserialize_vector_part(std::stringstream& ss, std::vector<size_t>& v);
 
 private:
     tcp::socket m_Socket;
-    enum { max_length = 1024 };
+	enum { max_length = 65535 };
     char m_Data[max_length];
     int m_Context;
 };

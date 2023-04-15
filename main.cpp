@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
 	size_t commands_max_size;
 	if (argc != 3)
 	{
-		std::cerr << "Usage: BatchCommandHandler <port> <size_commands>\n";
+		std::cerr << "Usage: DataBlocksExchange <port> <size_commands>\n";
 		return 1;
 	}
 	try

@@ -8,6 +8,7 @@ Server::Server(const short port, const size_t commands_size)
 	: m_Acceptor(m_IoContext, tcp::endpoint(tcp::v4(), port))
 	, m_CommandsSize(commands_size)
 {
+	m_BlockDeviceReader = new BlockDeviceReader();
 	do_accept();
 }
 
@@ -22,6 +23,7 @@ void Server::run()
 {
 	m_IoContext.run();
 }
+
 
 void Server::do_accept()
 {

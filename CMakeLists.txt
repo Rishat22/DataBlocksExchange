@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(PROJECT_NAME DataBlocksExchange)
+set(CLIENT_NAME client)
 set(TEST_NAME test_${PROJECT_NAME})
 set(LIBRARY_NAME async)
 set(PATHS include/ include/outputs/ include/network/)
@@ -45,9 +46,31 @@ file(GLOB TEST_SRCS
     tests/*.cpp
     )
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+
 add_executable(${TEST_NAME}
     ${SRCS}
     ${TEST_SRCS}
+    )
+
+target_include_directories(${TEST_NAME} PUBLIC
+    ${CMAKE_BINARY_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}/include
+    )
+target_include_directories(${TEST_NAME} PRIVATE
+    ${PATHS}
+    ${CMAKE_BINARY_DIR}
+)
+
+add_executable(${CLIENT_NAME} ${SRCS} client.cpp)
+target_link_libraries(${CLIENT_NAME} PUBLIC pthread)
+target_link_libraries(${CLIENT_NAME} PRIVATE ${LIBRARY_NAME})
+target_include_directories(${CLIENT_NAME} PUBLIC
+    ${CMAKE_BINARY_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}/include
+    )
+target_include_directories(${CLIENT_NAME} PRIVATE
+    ${PATHS}
+    ${CMAKE_BINARY_DIR}
     )
 
 target_include_directories(${TEST_NAME} PUBLIC
@@ -71,8 +94,14 @@ if (MSVC)
     target_compile_options(${TEST_NAME} PRIVATE
         /W4
         )
+    target_compile_options(${CLIENT_NAME} PRIVATE
+        /W4
+        )
 else ()
     target_compile_options(${PROJECT_NAME} PRIVATE
+        -Wall -Wextra -pedantic -Werror
+        )
+    target_compile_options(${TEST_NAME} PRIVATE
         -Wall -Wextra -pedantic -Werror
         )
     target_compile_options(${TEST_NAME} PRIVATE
@@ -81,6 +110,7 @@ else ()
 endif()
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+install(TARGETS ${TEST_NAME} RUNTIME DESTINATION bin)
 install(TARGETS ${LIBRARY_NAME} LIBRARY DESTINATION lib)
 
 set(CPACK_GENERATOR DEB)

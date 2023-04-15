@@ -1,6 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 #include <boost/asio.hpp>
+#include "block_device_reader.h"
 
 namespace network {
 
@@ -20,6 +21,7 @@ private:
 	boost::asio::io_context m_IoContext;
 	tcp::acceptor m_Acceptor;
 	size_t m_CommandsSize;
+	BlockDeviceReader* m_BlockDeviceReader;
 };
 
 
