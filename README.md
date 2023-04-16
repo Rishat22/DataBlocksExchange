@@ -1,7 +1,7 @@
 # Data Blocks Exchange
 * First you need to start the server part
 
-**Usage**: `./DataBlocksExchange <port> <size_commands>\n`
+**Usage**: `./DataBlocksExchange <port>\n`
 
 * To run the client part:
 

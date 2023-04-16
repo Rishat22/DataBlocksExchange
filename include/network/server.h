@@ -10,8 +10,8 @@ using boost::asio::ip::tcp;
 class Server
 {
 public:
-	Server(const short port, const size_t commands_size);
-	Server(const boost::asio::ip::address& addr, const short port, const size_t commands_size);
+	Server(const short port);
+	Server(const boost::asio::ip::address& addr, const short port);
 	void run();
 
 private:
@@ -20,8 +20,7 @@ private:
 private:
 	boost::asio::io_context m_IoContext;
 	tcp::acceptor m_Acceptor;
-	size_t m_CommandsSize;
-	BlockDeviceReader* m_BlockDeviceReader;
+	std::shared_ptr<BlockDeviceReader> m_BlockDeviceReader;
 };
 
 

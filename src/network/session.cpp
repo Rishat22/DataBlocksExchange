@@ -1,14 +1,12 @@
 #include <iostream> // ToDo delete
-#include <async.h>
 #include "session.h"
 
 namespace network {
 
-Session::Session(tcp::socket socket, const size_t commands_size)
+Session::Session(tcp::socket socket)
 	: m_Socket(std::move(socket))
-	, m_Context(-1)
 {
-	m_Context = async::connect(commands_size);
+//	m_Context = async::connect(commands_size);
 }
 
 void Session::start()
@@ -16,6 +14,7 @@ void Session::start()
 	do_read();
 }
 
+/** ToDo there are no different error checks */
 void Session::deserialize_vector_part(std::stringstream& ss, std::vector<size_t>& v)
 {
 	size_t total_size;
@@ -36,7 +35,6 @@ void Session::deserialize_vector_part(std::stringstream& ss, std::vector<size_t>
 	{
 		ss.read(reinterpret_cast<char*>(&v[index]), sizeof(size_t));
 	}
-	std::cout << v[offset] << " and " << v[offset + size - 1] << std::endl; // ToDo delete
 }
 
 void Session::do_read()
@@ -47,9 +45,8 @@ void Session::do_read()
 	{
 		if (ec)
 		{
-			ec.message();
-			std::cout << std::endl;
-			async::disconnect(m_Context);
+			std::cout << ec.message() << std::endl;
+//			async::disconnect(m_Context);
 			return;
 		}
 
@@ -63,6 +60,16 @@ void Session::do_read()
 
 		do_read();
 	});
+}
+
+void Session::connect()
+{
+
+}
+
+void Session::disconnect()
+{
+
 }
 
 }

@@ -4,17 +4,15 @@
 
 namespace network {
 
-Server::Server(const short port, const size_t commands_size)
+Server::Server(const short port)
 	: m_Acceptor(m_IoContext, tcp::endpoint(tcp::v4(), port))
-	, m_CommandsSize(commands_size)
 {
-	m_BlockDeviceReader = new BlockDeviceReader();
+	m_BlockDeviceReader = std::make_shared<BlockDeviceReader>();
 	do_accept();
 }
 
-Server::Server(const boost::asio::ip::address& addr, const short port, const size_t commands_size)
+Server::Server(const boost::asio::ip::address& addr, const short port)
 	: m_Acceptor(m_IoContext, tcp::endpoint(addr, port))
-	, m_CommandsSize(commands_size)
 {
 	do_accept();
 }
@@ -32,7 +30,7 @@ void Server::do_accept()
 	{
 		if (!ec)
 		{
-			std::make_shared<Session>(std::move(socket), m_CommandsSize)->start();
+			std::make_shared<Session>(std::move(socket))->start();
 		}
 
 		do_accept();

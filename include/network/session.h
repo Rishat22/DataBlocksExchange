@@ -11,18 +11,19 @@ using boost::asio::ip::tcp;
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
-    Session(tcp::socket socket, const size_t commands_size);
-    void start();
+	Session(tcp::socket socket);
+	void start();
 
 private:
-    void do_read();
+	void do_read();
 	void deserialize_vector_part(std::stringstream& ss, std::vector<size_t>& v);
 
+	void connect();
+	void disconnect();
 private:
-    tcp::socket m_Socket;
+	tcp::socket m_Socket;
 	enum { max_length = 65535 };
-    char m_Data[max_length];
-    int m_Context;
+	char m_Data[max_length];
 };
 
 }

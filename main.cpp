@@ -4,23 +4,21 @@
 int main(int argc, char* argv[])
 {
 	short port;
-	size_t commands_max_size;
-	if (argc != 3)
+	if (argc != 2)
 	{
-		std::cerr << "Usage: DataBlocksExchange <port> <size_commands>\n";
+		std::cerr << "Usage: DataBlocksExchange <port>\n";
 		return 1;
 	}
 	try
 	{
 		port = std::stoi(argv[1]);
-		commands_max_size = std::stoi(argv[2]);
 	}
 	catch (const std::invalid_argument& ia) {
 		std::cerr << "Invalid argument: " << ia.what() << '\n';
 		return 1;
 	}
 
-	network::Server server(port, commands_max_size);
+	network::Server server(port);
 	server.run();
 
   return 0;

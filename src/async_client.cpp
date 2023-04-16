@@ -14,11 +14,11 @@ AsyncClient::AsyncClient()
 void AsyncClient::get(const std::string& host, const std::string& service)
 {
 	ba::ip::tcp::resolver::query query{host, service};
-	m_Resolver.async_resolve(
-				query,
-				[this](const boost::system::error_code &ec, ba::ip::tcp::resolver::iterator it)
-				{	this->resolve_handler(ec, it); }
-	);
+
+	m_Resolver.async_resolve( query,
+	[this](const boost::system::error_code &ec, ba::ip::tcp::resolver::iterator it){
+		this->resolve_handler(ec, it);
+	});
 }
 
 void AsyncClient::run()
@@ -40,11 +40,10 @@ void AsyncClient::resolve_handler(const boost::system::error_code& ec, ba::ip::t
 		return;
 	}
 
-	m_TCPSocket.async_connect(
-				*it,
-				[&](const boost::system::error_code &ec)
-				{ this->connect_handler(ec); }
-	);
+	m_TCPSocket.async_connect(*it,
+	[&](const boost::system::error_code &ec){
+		this->connect_handler(ec);
+	});
 }
 
 void AsyncClient::connect_handler(const boost::system::error_code& ec)
@@ -59,10 +58,9 @@ void AsyncClient::connect_handler(const boost::system::error_code& ec)
 
 	m_TCPSocket.async_read_some(
 				ba::buffer(m_Buffer),
-				[&](const boost::system::error_code &ec, std::size_t bytes_transferred) {
+	[&](const boost::system::error_code &ec, std::size_t bytes_transferred)	{
 		this->read_handler(ec, bytes_transferred);
-	}
-	);
+	});
 }
 
 void AsyncClient::read_handler(const boost::system::error_code& ec, std::size_t bytes_transferred)
@@ -81,23 +79,22 @@ void AsyncClient::read_handler(const boost::system::error_code& ec, std::size_t 
 
 	std::cout << "[readHandler] - read " << bytes_transferred << " bytes" << std::endl;
 
-
 	m_TCPSocket.async_read_some(
 				ba::buffer(m_Buffer),
 				[&](const boost::system::error_code &ec, std::size_t bytes_transferred) {
 		read_handler(ec, bytes_transferred);
-	}
-	);
+	});
 }
 
+/** ToDo there are no different error checks */
 void AsyncClient::serialize_vector_part(std::stringstream& ss, const std::vector<size_t>& v, const size_t offset, const size_t size)
 {
-	auto total_size = v.size();
+	const auto total_size = v.size();
 	ss.write(reinterpret_cast<char const*>(&total_size), sizeof(total_size));
 	ss.write(reinterpret_cast<char const*>(&offset), sizeof(offset));
 	ss.write(reinterpret_cast<char const*>(&size), sizeof(size));
 
-	/** ToDo a better solution, but it didn't work out,
+	/** ToDo a better solution, but it didn't work,
 	there wasn't enough time to figure it out */
 //	os.write(reinterpret_cast<char const*>(v.data() + offset * sizeof(size_t) ), v.size() * sizeof(size_t));
 
@@ -122,6 +119,7 @@ void AsyncClient::generate_request()
 {
 	std::srand(unsigned(std::time(nullptr)));
 
+//	const size_t max_possible_len = 10000;
 	const size_t len = 3550;//std::rand() % max_possible_len;
 
 	std::vector<size_t> gen_vec(len);
@@ -140,7 +138,6 @@ void AsyncClient::generate_request()
 		size_t packet_size = index + max_packet_len;
 		packet_size = (packet_size > len) ? (len - index) : max_packet_len;
 		serialize_vector_part(ss, gen_vec, index, packet_size);
-		std::cout << gen_vec[index] << " and " << gen_vec[index + packet_size] << std::endl;
 
 		ba::async_write(m_TCPSocket, ba::buffer(ss.str()),
 		[](boost::system::error_code /*ec*/, std::size_t /*length*/)
