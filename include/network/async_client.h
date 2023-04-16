@@ -25,6 +25,7 @@ private:
 	ba::ip::tcp::socket m_TCPSocket;
 	enum { max_length = 65535 };
 	std::array<char, max_length> m_Buffer;
+	std::vector<size_t> m_ReqHashesList;
 };
 
 #endif // ASYNCCLIENT_H

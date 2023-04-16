@@ -14,6 +14,30 @@ void Session::start()
 	do_read();
 }
 
+void Session::do_read()
+{
+	auto self(shared_from_this());
+	m_Socket.async_read_some(boost::asio::buffer(m_Data, max_length),
+	[this, self](boost::system::error_code ec, std::size_t length)
+	{
+		if (ec)
+		{
+			std::cout << ec.message() << std::endl;
+//			async::disconnect(m_Context);
+			return;
+		}
+
+		std::stringstream ss;
+		ss << std::string{m_Data, length};
+		std::vector<size_t> gen_vec;
+		deserialize_vector_part(ss, gen_vec);
+
+//		async::receive(m_Data, length, m_Context);
+
+		do_read();
+	});
+}
+
 /** ToDo there are no different error checks */
 void Session::deserialize_vector_part(std::stringstream& ss, std::vector<size_t>& v)
 {
@@ -35,31 +59,6 @@ void Session::deserialize_vector_part(std::stringstream& ss, std::vector<size_t>
 	{
 		ss.read(reinterpret_cast<char*>(&v[index]), sizeof(size_t));
 	}
-}
-
-void Session::do_read()
-{
-	auto self(shared_from_this());
-	m_Socket.async_read_some(boost::asio::buffer(m_Data, max_length),
-	[this, self](boost::system::error_code ec, std::size_t length)
-	{
-		if (ec)
-		{
-			std::cout << ec.message() << std::endl;
-//			async::disconnect(m_Context);
-			return;
-		}
-
-
-		std::stringstream ss;
-		ss << std::string{m_Data, length};
-		std::vector<size_t> gen_vec;
-		deserialize_vector_part(ss, gen_vec);
-
-//		async::receive(m_Data, length, m_Context);
-
-		do_read();
-	});
 }
 
 void Session::connect()

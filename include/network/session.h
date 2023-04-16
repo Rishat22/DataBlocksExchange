@@ -14,12 +14,12 @@ public:
 	Session(tcp::socket socket);
 	void start();
 
+	void connect();
+	void disconnect();
 private:
 	void do_read();
 	void deserialize_vector_part(std::stringstream& ss, std::vector<size_t>& v);
 
-	void connect();
-	void disconnect();
 private:
 	tcp::socket m_Socket;
 	enum { max_length = 65535 };
