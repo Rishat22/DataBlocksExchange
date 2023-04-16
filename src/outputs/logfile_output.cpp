@@ -89,7 +89,7 @@ void LogFileOutput::startWork()
 	{
 		thread = std::thread([&]()
 		{
-			while (m_isWorking || !m_CmdTasks.empty())
+			while (m_isWorking && !m_CmdTasks.empty())
 			{
 				const auto task_data = wait_for_task(m_TaskReady);
 				saveData(task_data);
