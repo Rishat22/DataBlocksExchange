@@ -3,10 +3,11 @@
 
 namespace network {
 
-Session::Session(tcp::socket socket)
+Session::Session(tcp::socket socket, std::shared_ptr<DataBlockHandler> data_block_handler)
 	: m_Socket(std::move(socket))
+	, m_DataBlockHandler(data_block_handler)
 {
-//	m_Context = async::connect(commands_size);
+
 }
 
 void Session::start()
@@ -22,17 +23,17 @@ void Session::do_read()
 	{
 		if (ec)
 		{
+			/** disconnect */
 			std::cout << ec.message() << std::endl;
-//			async::disconnect(m_Context);
 			return;
 		}
 
 		std::stringstream ss;
 		ss << std::string{m_Data, length};
-		std::vector<size_t> gen_vec;
-		deserialize_vector_part(ss, gen_vec);
+		std::vector<size_t> req_hashes;
+		deserialize_vector_part(ss, req_hashes);
 
-//		async::receive(m_Data, length, m_Context);
+//		m_DataBlockHandler->request_data(req_hashes);
 
 		do_read();
 	});
@@ -59,16 +60,6 @@ void Session::deserialize_vector_part(std::stringstream& ss, std::vector<size_t>
 	{
 		ss.read(reinterpret_cast<char*>(&v[index]), sizeof(size_t));
 	}
-}
-
-void Session::connect()
-{
-
-}
-
-void Session::disconnect()
-{
-
 }
 
 }

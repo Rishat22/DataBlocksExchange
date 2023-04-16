@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 set(PROJECT_NAME DataBlocksExchange)
 set(CLIENT_NAME client)
 set(TEST_NAME test_${PROJECT_NAME})
-set(PATHS include/ include/outputs/ include/network/)
+set(PATHS include/ include/data/ include/network/)
 
 if(DEFINED ENV{GITHUB_RUN_NUMBER})
     project(${PROJECT_NAME} VERSION 0.0.$ENV{GITHUB_RUN_NUMBER})
@@ -16,12 +16,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 file(GLOB HRDS
     include/*.h
-    include/outputs/*.h
+    include/data/*.h
     include/network/*.h
     )
 file(GLOB SRCS
     src/*.cpp
-    src/outputs/*.cpp
+    src/data/*.cpp
     src/network/*.cpp
     )
 

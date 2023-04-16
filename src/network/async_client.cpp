@@ -92,36 +92,46 @@ void AsyncClient::do_read()
 	);
 }
 
+/** We send requests in parts.
+ *  The separation occurs according to the max_packet_len rule */
 void AsyncClient::generate_request()
 {
 	std::srand(unsigned(std::time(nullptr)));
 
+//ToDo return back
 //	const size_t max_possible_len = 10000;
 	const size_t len = 3550;//std::rand() % max_possible_len;
 
 	m_ReqHashesList = std::vector<size_t>(len);
 	for(size_t index(0); index < len; ++index)
 	{
-		m_ReqHashesList[index] = rand();
+		m_ReqHashesList[index] = index;
 	}
 
 	const size_t max_packet_len = 1000;
-	size_t index(0);
-	std::stringstream ss;
-	while(index < len)
+	send_request_hashes(m_ReqHashesList, max_packet_len, 0);
+}
+
+void AsyncClient::send_request_hashes(const std::vector<size_t>& v, const size_t max_packet_len, const size_t offset)
+{
+	const auto total_size = v.size();
+	if(offset >= total_size)
 	{
-		ss.str(std::string());
-
-		size_t packet_size = index + max_packet_len;
-		packet_size = (packet_size > len) ? (len - index) : max_packet_len;
-		serialize_vector_part(ss, m_ReqHashesList, index, packet_size);
-
-		ba::async_write(m_TCPSocket, ba::buffer(ss.str()),
-		[](boost::system::error_code /*ec*/, std::size_t /*length*/)
-		{});
-
-		index += packet_size;
+		return;
 	}
+	size_t packet_size = offset + max_packet_len;
+	packet_size = (packet_size < total_size) ? max_packet_len : (total_size - offset);
+
+	std::stringstream ss;
+	serialize_vector_part(ss, v, offset, packet_size);
+	ba::async_write(m_TCPSocket, ba::buffer(ss.str()),
+	[this, &v, max_packet_len, offset, packet_size](boost::system::error_code ec, std::size_t /*length*/)
+	{
+		if (!ec)
+		{
+			send_request_hashes(v, max_packet_len, offset + packet_size);
+		}
+	});
 }
 
 /** ToDo there are no different error checks */

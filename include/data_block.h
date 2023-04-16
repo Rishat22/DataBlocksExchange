@@ -1,42 +1,23 @@
 #ifndef DATABLOCK_H
 #define DATABLOCK_H
-#include <string>
+#include <cstddef>
 
 class DataBlock
 {
-
 public:
-	char* Data() const;
-	void setData(char* newData, int size);
-
-	const std::string& Hash() const;
-	void setHash(const std::string& newHash);
-
-private:
+	DataBlock(size_t hash, char* newData, int size)
+		: m_Hash(hash)
+		, m_Data(newData)
+		, m_Size(size)
+	{
+	}
+	~DataBlock() { if(m_Data) delete m_Data;}
+public:
+	size_t m_Hash;
 	char* m_Data;
 	int m_Size;
-	std::string m_Hash;
 };
 
-inline char* DataBlock::Data() const
-{
-	return m_Data;
-}
 
-inline void DataBlock::setData(char* newData, int size)
-{
-	m_Data = newData;
-	m_Size = size;
-}
-
-inline const std::string& DataBlock::Hash() const
-{
-	return m_Hash;
-}
-
-inline void DataBlock::setHash(const std::string& newHash)
-{
-	m_Hash = newHash;
-}
 
 #endif // DATABLOCK_H

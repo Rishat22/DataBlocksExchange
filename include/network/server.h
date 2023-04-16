@@ -1,7 +1,8 @@
 #ifndef SERVER_H
 #define SERVER_H
 #include <boost/asio.hpp>
-#include "block_device_reader.h"
+#include "data/data_block_handler.h"
+#include "data/block_device_reader.h"
 
 namespace network {
 
@@ -20,7 +21,7 @@ private:
 private:
 	boost::asio::io_context m_IoContext;
 	tcp::acceptor m_Acceptor;
-	std::shared_ptr<BlockDeviceReader> m_BlockDeviceReader;
+	std::shared_ptr<DataBlockHandler> m_DataBlockHandler;
 };
 
 
