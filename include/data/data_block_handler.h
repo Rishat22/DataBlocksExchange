@@ -6,6 +6,7 @@
 #include <thread>
 #include <condition_variable>
 #include "data/idevice_reader.h"
+#include "data_block.h"
 
 const size_t THREADS_COUNT = 2;
 
@@ -17,8 +18,8 @@ public:
 	void start_work();
 	void stop_work();
 	void request_data(const std::vector<size_t>& hashes);
+	std::vector<DataBlock> request_data_from_device_reader(const std::vector<size_t>& hashes);
 private:
-	void send_data(const std::vector<size_t>& hashes);
 	std::vector<size_t> wait_for_task(bool& task_ready);
 private:
 	std::queue<std::vector<size_t>> m_CmdTasks;

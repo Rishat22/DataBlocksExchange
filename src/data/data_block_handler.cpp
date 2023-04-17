@@ -1,7 +1,6 @@
 #include <sstream>
 #include <string>
 #include "data_block_handler.h"
-#include "data_block.h"
 
 DataBlockHandler::DataBlockHandler(std::shared_ptr<IDeviceReader> device_reader)
 	: m_TaskReady(false)
@@ -46,14 +45,16 @@ void DataBlockHandler::start_work()
 			while (m_isWorking && !m_CmdTasks.empty())
 			{
 				const auto task_data = wait_for_task(m_TaskReady);
-				send_data(task_data);
+				request_data_from_device_reader(task_data);
 			}
 		});
 	}
 }
 
-void DataBlockHandler::send_data(const std::vector<size_t>& hashes)
+std::vector<DataBlock> DataBlockHandler::request_data_from_device_reader(const std::vector<size_t>& hashes)
 {
+	std::vector<DataBlock> data_blocks;
+	data_blocks.reserve(hashes.size());
 	for(const size_t hash : hashes)
 	{
 		const std::string str_hash = std::to_string(hash);
@@ -62,8 +63,10 @@ void DataBlockHandler::send_data(const std::vector<size_t>& hashes)
 		char* data = nullptr;
 		m_DeviceReader->get_block_data(block_num, data, buffer_size);
 
-		DataBlock block(hash, data, buffer_size);
+		data_blocks.emplace_back(hash, data, buffer_size);
 	}
+
+	return data_blocks;
 }
 
 void DataBlockHandler::stop_work()

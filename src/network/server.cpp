@@ -9,6 +9,7 @@ Server::Server(const short port)
 {
 	std::shared_ptr<IDeviceReader> m_BlockDeviceReader = std::make_shared<BlockDeviceReader>();
 	m_DataBlockHandler = std::make_shared<DataBlockHandler>(m_BlockDeviceReader);
+	m_DataBlockHandler->start_work();
 	do_accept();
 }
 

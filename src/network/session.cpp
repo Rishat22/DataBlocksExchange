@@ -33,7 +33,15 @@ void Session::do_read()
 		std::vector<size_t> req_hashes;
 		deserialize_vector_part(ss, req_hashes);
 
-		m_DataBlockHandler->request_data(req_hashes);
+	/** I made the logic of working in a separate thread
+	 *  for a non-blocking call to the main thread,
+	 *  but I didn't think of how to beautifully return the data
+	 *  to be sent to the network. */
+//		m_DataBlockHandler->request_data(req_hashes);
+
+	/** Therefore, for now I will just make a blocking call
+	 *  to the data request. */
+		m_DataBlockHandler->request_data_from_device_reader(req_hashes);
 
 		do_read();
 	});
