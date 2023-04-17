@@ -23,7 +23,6 @@ void Server::run()
 	m_IoContext.run();
 }
 
-
 void Server::do_accept()
 {
 	m_Acceptor.async_accept(

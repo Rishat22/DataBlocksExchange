@@ -1,6 +1,7 @@
 #include <sstream>
 #include <string>
 #include "data_block_handler.h"
+#include "data_block.h"
 
 DataBlockHandler::DataBlockHandler(std::shared_ptr<IDeviceReader> device_reader)
 	: m_TaskReady(false)
@@ -60,6 +61,8 @@ void DataBlockHandler::send_data(const std::vector<size_t>& hashes)
 		const auto buffer_size = m_DeviceReader->get_block_size(str_hash);
 		char* data = nullptr;
 		m_DeviceReader->get_block_data(block_num, data, buffer_size);
+
+		DataBlock block(hash, data, buffer_size);
 	}
 }
 
