@@ -60,10 +60,11 @@ std::vector<DataBlock> DataBlockHandler::request_data_from_device_reader(const s
 		const std::string str_hash = std::to_string(hash);
 		const auto block_num = m_DeviceReader->get_block_number(str_hash);
 		const auto buffer_size = m_DeviceReader->get_block_size(str_hash);
-		char* data = nullptr;
-		m_DeviceReader->get_block_data(block_num, data, buffer_size);
 
-		data_blocks.emplace_back(hash, data, buffer_size);
+		char* buffer = new char[buffer_size];
+		m_DeviceReader->get_block_data(block_num, buffer, buffer_size);
+
+		data_blocks.emplace_back(hash, buffer, buffer_size);
 	}
 
 	return data_blocks;

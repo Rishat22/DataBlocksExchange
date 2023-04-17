@@ -20,7 +20,6 @@ private:
 	void read_handler(const boost::system::error_code &ec, std::size_t bytes_transferred);
 	void do_read();
 	void send_request_hashes(const std::vector<size_t>& v, const size_t max_packet_len, const size_t offset);
-	void serialize_vector_part(std::stringstream& ss, std::vector<size_t> const& v, const size_t offset, const size_t size);
 private:
 	ba::io_context m_IoContext;
 	ba::ip::tcp::resolver m_Resolver;

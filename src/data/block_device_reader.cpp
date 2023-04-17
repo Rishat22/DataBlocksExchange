@@ -22,11 +22,18 @@ size_t BlockDeviceReader::get_block_number(const std::string& /*hash*/)
 
 size_t BlockDeviceReader::get_block_size(const std::string& /*hash*/)
 {
-	return generate_random_int(1, 1000000);
+	return generate_random_int(1, 10000); //ToDo past 1mb as max : 10000000
 }
 
+/** Block Device Reader magically fills with data. Fill in the spaces */
 int BlockDeviceReader::get_block_data(size_t /*block_num*/, char* buffer, size_t buffer_size)
 {
-	buffer = new char[buffer_size];
+	for (size_t index = 0; index < buffer_size; ++index)
+	{
+		if (buffer[index] == '\0')
+		{
+			buffer[index] = ' ';
+		}
+	}
 	return 1;
 }

@@ -1,4 +1,5 @@
-#include <iostream> // ToDo delete
+#include <iostream>
+#include "data/data_serialization.h"
 #include "session.h"
 
 namespace network {
@@ -31,7 +32,7 @@ void Session::do_read()
 		std::stringstream ss;
 		ss << std::string{m_Data, length};
 		std::vector<size_t> req_hashes;
-		deserialize_vector_part(ss, req_hashes);
+		serialization::deserialize_vector_part(ss, req_hashes);
 
 	/** I made the logic of working in a separate thread
 	 *  for a non-blocking call to the main thread,
@@ -41,31 +42,43 @@ void Session::do_read()
 
 	/** Therefore, for now I will just make a blocking call
 	 *  to the data request. */
-		m_DataBlockHandler->request_data_from_device_reader(req_hashes);
-
-		do_read();
+		const auto res_data_blocks = m_DataBlockHandler->request_data_from_device_reader(req_hashes);
+		send_data_blocks(res_data_blocks);
 	});
 }
 
-/** ToDo there are no different error checks */
-void Session::deserialize_vector_part(std::stringstream& ss, std::vector<size_t>& v)
+void Session::send_data_blocks(const std::vector<DataBlock>& data_blocks)
 {
-	size_t total_size;
-	ss.read(reinterpret_cast<char*>(&total_size), sizeof(total_size));
-
-	size_t offset, size;
-	ss.read(reinterpret_cast<char*>(&offset), sizeof(offset));
-	ss.read(reinterpret_cast<char*>(&size), sizeof(size));
-
-	/** ToDo a better solution, but it didn't work out,
-	there wasn't enough time to figure it out */
-//	ss.read(reinterpret_cast<char*>(v.data()), size * sizeof(size_t));
-
-	v.resize(size);
-	for(size_t index(0); index < size; ++index)
+	for(const auto& data_block : data_blocks)
 	{
-		ss.read(reinterpret_cast<char*>(&v[index]), sizeof(size_t));
+		size_t max_packet_len = 10000;
+		max_packet_len = (max_packet_len < data_block.m_Size) ? max_packet_len : data_block.m_Size;
+		send_data_block(data_block, 0, max_packet_len);
 	}
+
+	do_read();
+}
+
+void Session::send_data_block(const DataBlock& data_block, const size_t offset, const size_t size)
+{
+	if(offset >= data_block.m_Size)
+	{
+		return;
+	}
+
+	size_t packet_size = offset + size;
+	packet_size = (packet_size < data_block.m_Size) ? packet_size : (data_block.m_Size - offset);
+
+	std::stringstream ss;
+	serialization::serialize_data_block(ss, data_block, offset, size);
+	boost::asio::async_write(m_Socket, boost::asio::buffer(ss.str()),
+	[this, &data_block, offset, packet_size](boost::system::error_code ec, std::size_t /*length*/)
+	{
+		if (!ec)
+		{
+			send_data_block(data_block, offset + packet_size, packet_size);
+		}
+	});
 }
 
 }

@@ -21,7 +21,7 @@ public:
 public:
 	size_t m_Hash;
 	char* m_Data;
-	int m_Size;
+	size_t m_Size;
 };
 
 

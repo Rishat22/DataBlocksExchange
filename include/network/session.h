@@ -17,7 +17,8 @@ public:
 
 private:
 	void do_read();
-	void deserialize_vector_part(std::stringstream& ss, std::vector<size_t>& v);
+	void send_data_blocks(const std::vector<DataBlock>& data_blocks);
+	void send_data_block(const DataBlock& data_block, const size_t offset, const size_t size);
 
 private:
 	tcp::socket m_Socket;
