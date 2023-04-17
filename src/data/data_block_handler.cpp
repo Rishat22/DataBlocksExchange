@@ -53,7 +53,7 @@ void DataBlockHandler::start_work()
 
 void DataBlockHandler::send_data(const std::vector<size_t>& hashes)
 {
-	for(size_t hash : hashes)
+	for(const size_t hash : hashes)
 	{
 		const std::string str_hash = std::to_string(hash);
 		const auto block_num = m_DeviceReader->get_block_number(str_hash);

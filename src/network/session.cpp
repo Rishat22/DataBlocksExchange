@@ -33,7 +33,7 @@ void Session::do_read()
 		std::vector<size_t> req_hashes;
 		deserialize_vector_part(ss, req_hashes);
 
-//		m_DataBlockHandler->request_data(req_hashes);
+		m_DataBlockHandler->request_data(req_hashes);
 
 		do_read();
 	});
@@ -44,8 +44,6 @@ void Session::deserialize_vector_part(std::stringstream& ss, std::vector<size_t>
 {
 	size_t total_size;
 	ss.read(reinterpret_cast<char*>(&total_size), sizeof(total_size));
-	if(v.empty())
-		v.resize(total_size);
 
 	size_t offset, size;
 	ss.read(reinterpret_cast<char*>(&offset), sizeof(offset));
@@ -55,8 +53,8 @@ void Session::deserialize_vector_part(std::stringstream& ss, std::vector<size_t>
 	there wasn't enough time to figure it out */
 //	ss.read(reinterpret_cast<char*>(v.data()), size * sizeof(size_t));
 
-	const size_t max_size = (offset + size);
-	for(size_t index(offset); index < max_size; ++index)
+	v.resize(size);
+	for(size_t index(0); index < size; ++index)
 	{
 		ss.read(reinterpret_cast<char*>(&v[index]), sizeof(size_t));
 	}

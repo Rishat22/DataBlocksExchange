@@ -3,8 +3,9 @@
 #include <boost/asio.hpp>
 #include <vector>
 
-namespace ba = boost::asio;
+namespace network {
 
+namespace ba = boost::asio;
 class AsyncClient
 {
 public:
@@ -29,4 +30,5 @@ private:
 	std::vector<size_t> m_ReqHashesList;
 };
 
+}
 #endif // ASYNCCLIENT_H

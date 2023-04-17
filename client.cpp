@@ -1,6 +1,8 @@
 #include <iostream>
 #include "network/async_client.h"
 
+using namespace network;
+
 int main(int argc, char* argv[])
 {
 	std::string host;

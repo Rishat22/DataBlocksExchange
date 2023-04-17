@@ -4,6 +4,7 @@
 #include <cstdlib>
 
 #include "async_client.h"
+namespace network {
 
 AsyncClient::AsyncClient()
 	: m_Resolver{m_IoContext}
@@ -92,8 +93,6 @@ void AsyncClient::do_read()
 	);
 }
 
-/** We send requests in parts.
- *  The separation occurs according to the max_packet_len rule */
 void AsyncClient::generate_request()
 {
 	std::srand(unsigned(std::time(nullptr)));
@@ -112,6 +111,8 @@ void AsyncClient::generate_request()
 	send_request_hashes(m_ReqHashesList, max_packet_len, 0);
 }
 
+/** We send requests in parts.
+ *  The separation occurs according to the max_packet_len rule */
 void AsyncClient::send_request_hashes(const std::vector<size_t>& v, const size_t max_packet_len, const size_t offset)
 {
 	const auto total_size = v.size();
@@ -151,4 +152,6 @@ void AsyncClient::serialize_vector_part(std::stringstream& ss, const std::vector
 	{
 		ss.write(reinterpret_cast<char const*>(&v[index]), sizeof(size_t));
 	}
+}
+
 }
